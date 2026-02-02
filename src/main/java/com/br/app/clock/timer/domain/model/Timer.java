@@ -16,7 +16,7 @@ public class Timer {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Timer(Long initialDurationInSeconds, Long currentTimeInSeconds, TimerType timerType) {
+    public Timer(Long initialDurationInSeconds, TimerType timerType) {
         this.id = UUID.randomUUID();
         if(initialDurationInSeconds < 0){
             throw new InvalidTimerDurationException("Timer duration cannot be negative.");
@@ -25,6 +25,8 @@ public class Timer {
         this.currentTimeInSeconds = (timerType == TimerType.COUNTDOWN) ? initialDurationInSeconds : 0L;
         this.timerType = timerType;
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        this.timerStatus = TimerStatus.STOPPED;
     }
 
     public void start() {
@@ -71,5 +73,9 @@ public class Timer {
 
     public boolean isFinished(){
         return this.timerType == TimerType.COUNTDOWN && this.currentTimeInSeconds == 0;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
