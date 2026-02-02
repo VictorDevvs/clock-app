@@ -1,0 +1,75 @@
+package com.br.app.clock.timer.domain.model;
+
+import com.br.app.clock.timer.domain.exception.InvalidTimerDurationException;
+import com.br.app.clock.timer.domain.exception.InvalidTimerStateException;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+public class Timer {
+
+    private UUID id;
+    private Long initialDurationInSeconds;
+    private Long currentTimeInSeconds;
+    private TimerStatus timerStatus;
+    private TimerType timerType;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    public Timer(Long initialDurationInSeconds, Long currentTimeInSeconds, TimerType timerType) {
+        this.id = UUID.randomUUID();
+        if(initialDurationInSeconds < 0){
+            throw new InvalidTimerDurationException("Timer duration cannot be negative.");
+        }
+        this.initialDurationInSeconds = initialDurationInSeconds;
+        this.currentTimeInSeconds = (timerType == TimerType.COUNTDOWN) ? initialDurationInSeconds : 0L;
+        this.timerType = timerType;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public void start() {
+        if(this.timerStatus == TimerStatus.RUNNING){
+            throw new InvalidTimerStateException("Timer is already running.");
+        }
+        this.timerStatus = TimerStatus.RUNNING;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void pause() {
+        if(this.timerStatus == TimerStatus.PAUSED){
+            throw new InvalidTimerStateException("Timer is already paused.");
+        }
+        this.timerStatus = TimerStatus.PAUSED;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void stop() {
+        if(this.timerStatus == TimerStatus.STOPPED){
+            throw new InvalidTimerStateException("Timer is already stopped.");
+        }
+        this.timerStatus = TimerStatus.STOPPED;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void tick(){
+        if(this.timerStatus == TimerStatus.RUNNING && this.currentTimeInSeconds > 0 && this.timerType == TimerType.COUNTDOWN){
+            this.currentTimeInSeconds--;
+            this.updatedAt = LocalDateTime.now();
+        }
+
+        if(this.timerStatus == TimerStatus.RUNNING && this.timerType == TimerType.STOPWATCH){
+            this.currentTimeInSeconds++;
+            this.updatedAt = LocalDateTime.now();
+        }
+    }
+
+    public void reset() {
+        this.currentTimeInSeconds = this.initialDurationInSeconds;
+        this.timerStatus = TimerStatus.STOPPED;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public boolean isFinished(){
+        return this.timerType == TimerType.COUNTDOWN && this.currentTimeInSeconds == 0;
+    }
+}
