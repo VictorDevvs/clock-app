@@ -163,45 +163,6 @@ Response
 Response
 204 
 
-🗂️ Estrutura de Pastas (exemplo)
-src/main/java/com.br.app.clock/timer
- └── adapter
-     └── in.web
-         └── dto
-             └── ErrorResponse
-             └── TimerResponse
-             └── UpdateTimerRequest
-         └── GlobalExceptionHandler
-         └── TimerController
-         └── out.persistence
-             └── SpringDataTimerRepository
-             └── TimerJpaEntity
-             └── TimerRepositoryAdapater
- └── application
-     └── port
-         └── in
-             └── CreateTimerCommand
-             └── CreateTimerUseCase
-             └── DeleteTimerUseCase
-             └── GetTimerUseCase
-             └── UpdateTimerCommand
-             └── UpdateTimerUseCase
-         └── out
-             └── TimerRepository
-     └── service
-         └── TimerService
- └── domain
-     └── exception
-         └── InvalidTimerDurationException
-         └── InvalidTimerStateException
-         └── TimerAlreadyFinishedException
-         └── TimerNotFoundException
-     └── model
-         └── Timer
-         └── TimerAction
-         └── TimerStatus
-         └── TimerType
-
 🧪 Banco de Dados
 
 Banco em memória H2 para testes e desenvolvimento.
