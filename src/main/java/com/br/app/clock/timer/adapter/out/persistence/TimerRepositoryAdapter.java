@@ -20,8 +20,15 @@ public class TimerRepositoryAdapter implements TimerRepository {
 
     @Override
     public Timer save(Timer timer) {
-        TimerJpaEntity entity = springDataTimerRepository.save(TimerJpaEntity.fromDomain(timer));
-        return TimerJpaEntity.toDomain(entity);
+        UUID id = timer.snapshot().id();
+
+        TimerJpaEntity entity = springDataTimerRepository.findById(id)
+                .orElseGet(TimerJpaEntity::new);
+
+        entity.updateFromDomain(timer);
+
+        TimerJpaEntity savedEntity = springDataTimerRepository.save(entity);
+        return TimerJpaEntity.toDomain(savedEntity);
     }
 
     @Override

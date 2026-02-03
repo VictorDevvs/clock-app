@@ -6,7 +6,6 @@ import com.br.app.clock.timer.domain.exception.TimerNotFoundException;
 import com.br.app.clock.timer.domain.model.Timer;
 import com.br.app.clock.timer.domain.model.TimerStatus;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,12 +21,14 @@ public class TimerService implements CreateTimerUseCase, DeleteTimerUseCase, Get
 
     @Override
     public Timer createTimer(CreateTimerCommand command) {
-        if(command.InitialDurationInSeconds() <= 0) {
-            throw new IllegalArgumentException("Duration must be greater than zero.");
+        if(command == null) {
+            throw new IllegalArgumentException("CreateTimerCommand cannot be null");
         }
-
+        if(command.timerType() == null){
+            throw new IllegalArgumentException("TimerType cannot be null");
+        }
         Timer timer = new Timer(
-                command.InitialDurationInSeconds(),
+                command.initialDurationInSeconds(),
                 command.timerType()
         );
 
@@ -36,8 +37,6 @@ public class TimerService implements CreateTimerUseCase, DeleteTimerUseCase, Get
 
     @Override
     public void deleteTimerById(UUID id) {
-        Timer timer = timerRepository.findById(id)
-                .orElseThrow(() -> new TimerNotFoundException("Timer not found."));
         timerRepository.deleteById(id);
     }
 
@@ -59,17 +58,19 @@ public class TimerService implements CreateTimerUseCase, DeleteTimerUseCase, Get
     @Override
     public Timer updateTimer(UpdateTimerCommand command) {
         Timer timer = timerRepository.findById(command.id())
-                .orElseThrow(() -> new TimerNotFoundException("Timer not found."));
+                .orElseThrow(() -> new TimerNotFoundException("Timer not found with id: " + command.id()));
+        Timer updatedTimer = applyAction(timer, command);
 
-        switch (command.action()){
+        return timerRepository.save(updatedTimer);
+    }
+
+    private Timer applyAction(Timer timer, UpdateTimerCommand command) {
+        return switch (command.action()) {
             case START -> timer.start();
             case PAUSE -> timer.pause();
             case STOP -> timer.stop();
             case RESET -> timer.reset();
             case TICK -> timer.tick();
-        }
-
-        timer.setUpdatedAt(LocalDateTime.now());
-        return timerRepository.save(timer);
+        };
     }
 }

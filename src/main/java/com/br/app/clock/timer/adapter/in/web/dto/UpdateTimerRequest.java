@@ -1,13 +1,9 @@
-package com.br.app.clock.timer.application.port.in;
+package com.br.app.clock.timer.adapter.in.web.dto;
 
 import com.br.app.clock.timer.domain.model.TimerAction;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.UUID;
-
-public record UpdateTimerCommand(
-        @NotNull(message = "Timer ID must not be null")
-        UUID id,
+public record UpdateTimerRequest(
         @NotNull(message = "Timer action must not be null")
         TimerAction action
 ) {
